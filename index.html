@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard ໂປຣ ເຝີງົວ+ນ້ຳກະຈ໋ຽບ</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans Lao','Noto Sans Thai',sans-serif;background:#0f1117;color:#e8eaf0;min-height:100vh;}
+
+/* ===== HEADER ===== */
+.header{background:#161b27;border-bottom:1px solid #232a3a;padding:20px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.header-left{display:flex;align-items:center;gap:14px;}
+.promo-badge{background:#4a1d9633;color:#c084fc;font-size:13px;font-weight:600;padding:7px 16px;border-radius:20px;border:1px solid #9333ea44;}
+.header h1{font-size:19px;font-weight:700;color:#fff;}
+.header .subtitle{font-size:12px;color:#6b7a99;margin-top:3px;}
+.date-badge{background:#4a1d9622;color:#c084fc;font-size:12px;padding:6px 14px;border-radius:20px;border:1px solid #9333ea33;white-space:nowrap;}
+
+.container{max-width:1200px;margin:0 auto;padding:24px 32px;}
+
+/* ===== PROMO BANNER ===== */
+.promo-banner{background:#161b27;border:1px solid #232a3a;border-radius:14px;padding:18px 24px;margin-bottom:18px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+.promo-name{font-size:16px;font-weight:700;color:#d8b4fe;line-height:1.5;}
+.promo-detail{font-size:11px;color:#6b7a99;margin-top:4px;line-height:1.7;}
+.promo-tags{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;padding-top:2px;}
+.tag{font-size:11px;font-weight:600;padding:5px 12px;border-radius:14px;white-space:nowrap;}
+.tag-purple{background:#4a1d9633;color:#c084fc;border:1px solid #9333ea44;}
+.tag-amber{background:#451a0333;color:#fbbf24;border:1px solid #f59e0b44;}
+.tag-red{background:#7f1d1d33;color:#f87171;border:1px solid #ef444444;}
+.tag-green{background:#14532d33;color:#4ade80;border:1px solid #22c55e44;}
+
+/* ===== TARGET BANNER ===== */
+.target-banner{background:#161b27;border:1px solid #232a3a;border-radius:14px;padding:18px 24px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.target-label{font-size:11px;color:#6b7a99;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.target-val{font-size:22px;font-weight:700;color:#fbbf24;}
+.target-sub{font-size:12px;color:#6b7a99;margin-top:2px;}
+.meter-wrap{flex:1;min-width:240px;}
+.meter-label{display:flex;justify-content:space-between;font-size:12px;color:#6b7a99;margin-bottom:6px;}
+.meter-track{height:10px;background:#1e2535;border-radius:5px;overflow:hidden;}
+.meter-fill{height:100%;border-radius:5px;}
+.meter-pct{font-size:20px;font-weight:700;margin-top:6px;}
+
+/* ===== KPI ===== */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;}
+.kpi-card{background:#161b27;border:1px solid #232a3a;border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0;}
+.kpi-card.purple::before{background:#9333ea;}
+.kpi-card.amber::before{background:#f59e0b;}
+.kpi-card.red::before{background:#ef4444;}
+.kpi-card.blue::before{background:#3b82f6;}
+.kpi-card.orange::before{background:#f97316;}
+.kpi-label{font-size:10px;color:#6b7a99;text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;}
+.kpi-value{font-size:20px;font-weight:700;color:#fff;line-height:1;}
+.kpi-sub{font-size:11px;color:#6b7a99;margin-top:6px;}
+
+/* ===== CHART CARDS ===== */
+.charts-row{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:18px;}
+.chart-card{background:#161b27;border:1px solid #232a3a;border-radius:12px;padding:18px 20px;}
+.chart-title{font-size:14px;font-weight:600;color:#c8cfe0;margin-bottom:3px;}
+.chart-sub{font-size:12px;color:#6b7a99;margin-bottom:14px;}
+.bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+/* ===== DAY GRID ===== */
+.day-grid{display:flex;flex-direction:column;gap:8px;}
+.day-row{display:flex;align-items:center;gap:10px;}
+.day-label{font-size:12px;color:#8a96b0;width:42px;flex-shrink:0;}
+.day-track{flex:1;height:24px;background:#1e2535;border-radius:5px;overflow:hidden;position:relative;}
+.day-fill{height:100%;border-radius:5px;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:600;white-space:nowrap;}
+.day-fill.zero{background:rgba(75,85,99,0.22);color:#4b5563;}
+.day-fill.miss{background:rgba(168,85,247,0.25);color:#d8b4fe;}
+.day-fill.near{background:rgba(245,158,11,0.32);color:#fcd34d;}
+.day-fill.hit{background:rgba(34,197,94,0.35);color:#86efac;}
+.day-target-line{position:absolute;top:0;bottom:0;width:2px;background:#fbbf24;opacity:.85;}
+.day-count{font-size:12px;font-weight:700;width:38px;text-align:right;flex-shrink:0;}
+.day-status{font-size:14px;width:20px;flex-shrink:0;}
+
+/* ===== TABLE ===== */
+.txn-table{width:100%;border-collapse:collapse;font-size:12px;}
+.txn-table th{text-align:left;color:#6b7a99;font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:0 0 8px;border-bottom:1px solid #232a3a;}
+.txn-table td{padding:8px 0;color:#c8cfe0;border-bottom:1px solid #1a2030;}
+.txn-table tr:last-child td{border-bottom:none;}
+.num-right{text-align:right;font-variant-numeric:tabular-nums;}
+.qty-pill{display:inline-block;background:#4a1d9633;color:#c084fc;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;border:1px solid #9333ea44;}
+
+.legend-row{display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#8a96b0;}
+.legend-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+
+/* ===== ALERT BOXES ===== */
+.gap-alert{background:#1a0d2e;border:1px solid #4a1d9666;border-radius:10px;padding:14px 18px;margin-top:14px;}
+.gap-alert-title{font-size:13px;font-weight:600;color:#c084fc;margin-bottom:6px;}
+.gap-list{font-size:12px;color:#d8b4fe;line-height:2;opacity:.85;}
+
+.zero-banner{background:#0d1117;border:1px solid #1e2535;border-radius:10px;padding:12px 16px;display:flex;align-items:flex-start;gap:10px;margin-top:10px;}
+.zero-banner-icon{font-size:18px;flex-shrink:0;margin-top:2px;}
+.zero-banner-text{font-size:12px;color:#6b7a99;line-height:1.7;}
+
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px;}
+.stat-box{background:#1a2035;border-radius:8px;padding:12px;}
+.stat-lbl{font-size:10px;color:#6b7a99;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
+.stat-val{font-size:14px;font-weight:600;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="promo-badge">🍜 ໂປຣ Bundle</div>
+    <div>
+      <h1>Dashboard ໂປຣ ເຝີງົວ + ນ້ຳກະຈ໋ຽບ</h1>
+      <div class="subtitle">ຮ້ານກ້ວຍຕ໋ຽວໄຂ່ຍ້ອນຍຸກ @ Friendship Mall (PS) · ກໍ.ລ. 2026</div>
+    </div>
+  </div>
+  <div class="date-badge">1–10 ກໍ.ລ. 2026</div>
+</div>
+
+<div class="container">
+
+  <!-- Promo banner -->
+  <div class="promo-banner">
+    <div style="flex:1;min-width:260px;">
+      <div class="promo-name">🍜 ເຝີງົວຖ້ວຍໃຫຍ່ ເສັ້ນນ້ອຍ ນ້ຳຕົກ + ນ້ຳກະຈ໋ຽບ Bundle</div>
+      <div class="promo-detail">
+        ສິນຄ້າ: ເສັ້ນນ້ອຍນ້ຳຕົກງົວ (ຖ້ວຍໃຫຍ່) + ນ້ຳກະຈ໋ຽບ<br>
+        ຮ້ານ: ຮ້ານກ້ວຍຕ໋ຽວໄຂ່ຍ້ອນຍຸກ @ Friendship Mall
+      </div>
+    </div>
+    <div class="promo-tags">
+      <span class="tag tag-amber">ລາຄາ Bundle ₭62,000/ເຊັດ</span>
+      <span class="tag tag-purple">ເປົ້າ 15 ເຊັດ/ວັນ</span>
+      <span class="tag tag-green">ຍອດຮັບ ₭1,240,000</span>
+      <span class="tag tag-red">Active 4/9 ວັນ</span>
+    </div>
+  </div>
+
+  <!-- Target meter -->
+  <div class="target-banner">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div style="font-size:26px;">🎯</div>
+      <div>
+        <div class="target-label">ເປົ້າໝາຍ</div>
+        <div class="target-val">15 ເຊັດ / ວັນ</div>
+        <div class="target-sub">ລວມ 9 ວັນ = 135 ເຊັດ · ເປົ້າ ₭8,370,000</div>
+      </div>
+    </div>
+    <div class="meter-wrap">
+      <div class="meter-label">
+        <span>ຜົນໄດ້ຮັບ: 20 / 135 ເຊັດ</span>
+        <span style="color:#f59e0b;font-weight:600">14.8%</span>
+      </div>
+      <div class="meter-track">
+        <div class="meter-fill" style="width:14.8%;background:linear-gradient(90deg,#ef4444,#f59e0b)"></div>
+      </div>
+      <div class="meter-pct" style="color:#f59e0b">14.8% <span style="font-size:13px;font-weight:400;color:#6b7a99">— ຂາດຈາກເປົ້າ 115 ເຊັດ</span></div>
+    </div>
+  </div>
+
+  <!-- KPI -->
+  <div class="kpi-grid">
+    <div class="kpi-card purple">
+      <div class="kpi-label">ຂາຍໄດ້ທັງໝົດ</div>
+      <div class="kpi-value">20 ເຊັດ</div>
+      <div class="kpi-sub">ເປົ້າ 135 ເຊັດ (9 ວັນ)</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">ຍອດຮັບຈິງ</div>
+      <div class="kpi-value">₭1,240,000</div>
+      <div class="kpi-sub">ເປົ້າ ₭8,370,000</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">ຂາດຈາກເປົ້າ</div>
+      <div class="kpi-value">115 ເຊັດ</div>
+      <div class="kpi-sub">₭7,130,000 ທີ່ຂາດ</div>
+    </div>
+    <div class="kpi-card orange">
+      <div class="kpi-label">Active Days</div>
+      <div class="kpi-value">4 / 9 ວັນ</div>
+      <div class="kpi-sub">Zero day 5 ວັນ (56%)</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">ສະເລ່ຍ/ວັນ</div>
+      <div class="kpi-value">2.2 ເຊັດ</div>
+      <div class="kpi-sub">ເປົ້າ 15 ເຊັດ/ວັນ</div>
+    </div>
+  </div>
+
+  <!-- Charts row -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">ຍອດຂາຍ ລາຍວັນ vs ເປົ້າ 15 ເຊັດ</div>
+      <div class="chart-sub">ຈຳນວນເຊັດ · ເສັ້ນສີເຫຼືອງ = ເປົ້າ 15 ເຊັດ/ວັນ</div>
+      <div class="legend-row">
+        <span class="legend-item"><span class="legend-dot" style="background:#c084fc"></span>ຈຳນວນເຊັດ</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#4ade80"></span>ຍອດຮັບ (₭)</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#fbbf24;border-radius:50%"></span>ເປົ້າ 15 ເຊັດ</span>
+      </div>
+      <div style="position:relative;width:100%;height:240px;"><canvas id="dailyChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">ຊ່ວງເວລາ Prime</div>
+      <div class="chart-sub">ຈຳນວນເຊັດ ແຕ່ລະຊົ່ວໂມງ</div>
+      <div style="position:relative;width:100%;height:265px;"><canvas id="hourChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Day grid + Txn -->
+  <div class="bottom-row">
+    <div class="chart-card">
+      <div class="chart-title">ຜົນລາຍວັນ vs ເປົ້າ 15 ເຊັດ</div>
+      <div class="chart-sub">Active 4 ວັນ · Zero 5 ວັນ · ສູງສຸດ: 7 ເຊັດ (07/07)</div>
+      <div class="day-grid" id="dayGrid"></div>
+      <div class="gap-alert">
+        <div class="gap-alert-title">📊 ສະຫຼຸບ Gap</div>
+        <div class="gap-list">
+          · ບໍ່ມີວັນໃດຮອດເປົ້າ 15 ເຊັດ ເລີຍ<br>
+          · ສູງສຸດ: 07 ກໍ.ລ. (7 ເຊັດ = 47%)<br>
+          · 5 ໃນ 9 ວັນ ບໍ່ໄດ້ຂາຍ (56% Zero day)<br>
+          · Prime time 13:00–15:00 (13/20 = 65%)<br>
+          · ຕ້ອງເພີ່ມ ~12.8 ເຊັດ/ວັນ ຈຶ່ງຮອດເປົ້າ
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">ລາຍການທຸລະກຳ</div>
+      <div class="chart-sub">14 ບິນ · 20 ເຊັດ · ₭1,240,000</div>
+      <table class="txn-table">
+        <thead>
+          <tr>
+            <th>ວັນທີ</th>
+            <th>ເວລາ</th>
+            <th class="num-right">ເຊັດ</th>
+            <th class="num-right">ຍອດ</th>
+          </tr>
+        </thead>
+        <tbody id="txnTable"></tbody>
+      </table>
+
+      <div class="zero-banner">
+        <div class="zero-banner-icon">⬜</div>
+        <div class="zero-banner-text">
+          <b style="color:#c8cfe0">ວັນ 0 ເຊັດ:</b> 01, 02, 03, 04, 10 ກໍ.ລ. (5 ວັນ)<br>
+          ໂປຣເລີ່ມຕົ້ນ 4 ວັນ ທຳອິດ ບໍ່ໄດ້ຂາຍ — ຄວນກວດ stock ຫຼື ການໂຄສະນາ
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-lbl">ວັນຂາຍດີສຸດ</div>
+          <div class="stat-val" style="color:#c084fc">07 ກໍ.ລ. (7 ເຊັດ)</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-lbl">Prime time</div>
+          <div class="stat-val" style="color:#4ade80">13:00–15:00</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-lbl">Zero day rate</div>
+          <div class="stat-val" style="color:#f87171">56% (5/9 ວັນ)</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-lbl">Achievement</div>
+          <div class="stat-val" style="color:#fbbf24">14.8%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const TARGET = 15;
+
+const daily = [
+  {d:'01/7',sets:0,rev:0},
+  {d:'02/7',sets:0,rev:0},
+  {d:'03/7',sets:0,rev:0},
+  {d:'04/7',sets:0,rev:0},
+  {d:'05/7',sets:5,rev:310000},
+  {d:'06/7',sets:4,rev:248000},
+  {d:'07/7',sets:7,rev:434000},
+  {d:'08/7',sets:4,rev:248000},
+  {d:'10/7',sets:0,rev:0},
+];
+
+const txns = [
+  {date:'05/07',time:'14:15',sets:2,rev:124000},
+  {date:'05/07',time:'15:29',sets:2,rev:124000},
+  {date:'05/07',time:'19:33',sets:1,rev:62000},
+  {date:'06/07',time:'12:37',sets:1,rev:62000},
+  {date:'06/07',time:'13:04',sets:1,rev:62000},
+  {date:'06/07',time:'16:08',sets:1,rev:62000},
+  {date:'06/07',time:'17:50',sets:1,rev:62000},
+  {date:'07/07',time:'12:46',sets:1,rev:62000},
+  {date:'07/07',time:'13:01',sets:1,rev:62000},
+  {date:'07/07',time:'13:41',sets:3,rev:186000},
+  {date:'07/07',time:'15:57',sets:2,rev:124000},
+  {date:'08/07',time:'13:35',sets:2,rev:124000},
+  {date:'08/07',time:'16:01',sets:1,rev:62000},
+  {date:'08/07',time:'20:32',sets:1,rev:62000},
+];
+
+// Daily chart
+const bgCol = d => d.sets===0?'rgba(75,85,99,0.18)':d.sets>=TARGET?'rgba(34,197,94,0.75)':d.sets>=TARGET*0.6?'rgba(245,158,11,0.65)':'rgba(192,132,252,0.55)';
+const bdCol = d => d.sets===0?'#374151':d.sets>=TARGET?'#22c55e':d.sets>=TARGET*0.6?'#f59e0b':'#c084fc';
+
+new Chart(document.getElementById('dailyChart'),{
+  type:'bar',
+  data:{
+    labels:daily.map(d=>d.d),
+    datasets:[
+      {label:'ເຊັດ',data:daily.map(d=>d.sets),
+       backgroundColor:daily.map(bgCol),borderColor:daily.map(bdCol),
+       borderWidth:1.5,borderRadius:5,yAxisID:'y',order:2},
+      {label:'ຍອດ',data:daily.map(d=>d.rev),
+       type:'line',borderColor:'#4ade80',backgroundColor:'rgba(74,222,128,0.06)',
+       borderWidth:2,pointRadius:daily.map(d=>d.sets>0?4:2),
+       pointBackgroundColor:daily.map(d=>d.sets>0?'#4ade80':'#374151'),
+       fill:true,tension:0.4,yAxisID:'y2',order:1},
+      {label:'ເປົ້າ',data:daily.map(()=>TARGET),
+       type:'line',borderColor:'#fbbf24',backgroundColor:'transparent',
+       borderWidth:2,borderDash:[6,4],pointRadius:0,yAxisID:'y',order:0}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{ticks:{color:'#6b7a99',font:{size:11}},grid:{color:'#1a2030'}},
+      y:{min:0,max:18,ticks:{color:'#c084fc',font:{size:10},stepSize:3},grid:{color:'#1a2030'},
+         title:{display:true,text:'ເຊັດ',color:'#c084fc',font:{size:10}}},
+      y2:{position:'right',ticks:{color:'#4ade80',font:{size:10},callback:v=>'₭'+(v/1000).toFixed(0)+'K'},
+          grid:{drawOnChartArea:false}}
+    }
+  }
+});
+
+// Hour chart
+const hLabels=['12','13','14','15','16','17','18','19','20'];
+const hData  =[2,   7,   2,   4,   2,   1,   0,   1,   1];
+new Chart(document.getElementById('hourChart'),{
+  type:'bar',
+  data:{labels:hLabels,datasets:[{
+    data:hData,
+    backgroundColor:hData.map(v=>v>=5?'rgba(192,132,252,0.85)':v>=2?'rgba(192,132,252,0.55)':v>0?'rgba(192,132,252,0.35)':'rgba(192,132,252,0.08)'),
+    borderColor:'#c084fc',borderWidth:1.5,borderRadius:5
+  }]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{ticks:{color:'#6b7a99',font:{size:10}},grid:{color:'#1a2030'},
+         title:{display:true,text:'ຊົ່ວໂມງ',color:'#6b7a99',font:{size:10}}},
+      y:{ticks:{color:'#6b7a99',font:{size:10},stepSize:1},grid:{color:'#1a2030'},
+         title:{display:true,text:'ເຊັດ',color:'#6b7a99',font:{size:10}}}
+    }
+  }
+});
+
+// Day grid
+const dayGrid=document.getElementById('dayGrid');
+daily.forEach(d=>{
+  const pct=Math.min(d.sets/TARGET*100,100);
+  const cls=d.sets===0?'zero':d.sets>=TARGET?'hit':d.sets>=TARGET*0.6?'near':'miss';
+  const icon=d.sets===0?'⬜':d.sets>=TARGET?'✅':d.sets>=TARGET*0.6?'🟡':'❌';
+  const gap=d.sets-TARGET;
+  const gc=d.sets===0?'#374151':d.sets>=TARGET?'#4ade80':d.sets>=TARGET*0.6?'#fbbf24':'#d8b4fe';
+  const lbl=d.sets===0?'— ບໍ່ໄດ້ຂາຍ':`${d.sets} ເຊັດ`;
+  dayGrid.innerHTML+=`
+    <div class="day-row">
+      <div class="day-label">${d.d}</div>
+      <div class="day-track">
+        <div class="day-fill ${cls}" style="width:${d.sets===0?100:Math.max(pct,8)}%">${lbl}</div>
+        <div class="day-target-line" style="left:100%"></div>
+      </div>
+      <div class="day-count" style="color:${gc}">${d.sets===0?'':gap>=0?'+'+gap:gap}</div>
+      <div class="day-status">${icon}</div>
+    </div>`;
+});
+
+// Txn table
+const tbody=document.getElementById('txnTable');
+txns.forEach(t=>{
+  tbody.innerHTML+=`<tr>
+    <td>${t.date}</td>
+    <td style="color:#6b7a99;font-size:11px">${t.time}</td>
+    <td class="num-right"><span class="qty-pill">${t.sets}x</span></td>
+    <td class="num-right" style="color:#4ade80;font-weight:600">₭${t.rev.toLocaleString()}</td>
+  </tr>`;
+});
+</script>
+</body>
+</html>
